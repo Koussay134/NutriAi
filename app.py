@@ -204,7 +204,7 @@ with tab1:
                             """
                         
                         res = client.models.generate_content(
-                            model='gemini-1.5-flash-8b',
+                            model='gemini-2.0-flash',
                             contents=[img_fast, prompt]
                         )
                         
