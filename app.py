@@ -166,7 +166,7 @@ with tab1:
                 with st.spinner("Analisi IA in corso..."):
                     try:
                         img_fast = Image.open(uploaded_file).copy()
-                        img_fast.thumbnail((800, 800))
+                        img_fast.thumbnail((500, 500))
                         client = genai.Client(api_key=API_KEY)
                         
                         if btn_piatto:
@@ -204,7 +204,7 @@ with tab1:
                             """
                         
                         res = client.models.generate_content(
-                            model='gemini-2.5-flash',
+                            model='gemini-1.5-flash-8b',
                             contents=[img_fast, prompt]
                         )
                         
