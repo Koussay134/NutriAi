@@ -203,25 +203,25 @@ with tab1:
                             }}
                             """
                         
-                       import time
-                        
-                        max_tentativi = 3
-                        for tentativo in range(max_tentativi):
-                            try:
-                                res = client.models.generate_content(
-                                    model='gemini-3.8-flash',
-                                    contents=[img_fast, prompt]
-                                )
-                                break
-                            except Exception as e:
-                                if tentativo < max_tentativi - 1:
-                                    time.sleep(2.5)
-                                    continue
-                                else:
-                                    raise e
-                        raw_text = res.text.strip().replace("```json", "").replace("```", "").strip()
-                        st.session_state.draft_meal = json.loads(raw_text)
-                        st.rerun()
+                           import time
+                            
+                            max_tentativi = 3
+                            for tentativo in range(max_tentativi):
+                                try:
+                                    res = client.models.generate_content(
+                                        model='gemini-3.8-flash',
+                                        contents=[img_fast, prompt]
+                                    )
+                                    break
+                                except Exception as e:
+                                    if tentativo < max_tentativi - 1:
+                                        time.sleep(2.5)
+                                        continue
+                                    else:
+                                        raise e
+                            raw_text = res.text.strip().replace("```json", "").replace("```", "").strip()
+                            st.session_state.draft_meal = json.loads(raw_text)
+                            st.rerun()
                     except Exception as e:
                         st.error(f"Errore: {e}")
 
