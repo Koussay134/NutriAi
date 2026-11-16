@@ -208,7 +208,7 @@ with tab1:
                         for tentativo in range(max_tentativi):
                             try:
                                 res = client.models.generate_content(
-                                    model='gemini-2.0-flash',
+                                    model='gemini-3.8-flash',
                                     contents=[img_fast, prompt]
                                 )
                                 break
