@@ -166,7 +166,7 @@ with tab1:
                 with st.spinner("Analisi IA in corso..."):
                     try:
                         img_fast = Image.open(uploaded_file).copy()
-                        img_fast.thumbnail((500, 500))
+                        img_fast.thumbnail((800, 800))
                         client = genai.Client(api_key=API_KEY)
                         
                         if btn_piatto:
@@ -203,8 +203,7 @@ with tab1:
                             }}
                             """
                         
-                      import time
-                        
+                        import time
                         max_tentativi = 3
                         for tentativo in range(max_tentativi):
                             try:
@@ -219,6 +218,7 @@ with tab1:
                                     continue
                                 else:
                                     raise e
+                        
                         raw_text = res.text.strip().replace("```json", "").replace("```", "").strip()
                         st.session_state.draft_meal = json.loads(raw_text)
                         st.rerun()
