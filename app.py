@@ -203,7 +203,7 @@ with tab1:
                             }}
                             """
                         
-                       import time
+                      import time
                         
                         max_tentativi = 3
                         for tentativo in range(max_tentativi):
