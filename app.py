@@ -167,7 +167,7 @@ with tab1:
                     try:
                         img_fast = Image.open(uploaded_file).copy()
                         img_fast.thumbnail((800, 800))
-                        client = genai.Client(api_key=API_KEY)
+                        client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1beta'})
                         
                         if btn_piatto:
                             prompt = f"""
