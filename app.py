@@ -10,16 +10,32 @@ import uuid
 st.set_page_config(page_title="NutriAI Pro", page_icon="📱", layout="centered")
 st.markdown("""
 <style>
+    /* Nasconde intestazioni e footer */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    
+    /* Riduce lo spazio in alto */
     .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
+        padding-top: 2rem;
     }
+    
+    /* Crea l'effetto Widget Apple per i riquadri dei macro */
+    div[data-testid="metric-container"] {
+        background-color: #1C1C1E; /* Grigio scuro tipico dei widget iOS */
+        border-radius: 20px;
+        padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        border-left: 4px solid #32D74B; /* Linea verde Apple in tema nutrizione */
+    }
+    
+    /* Arrotonda i bottoni */
     .stButton>button {
         border-radius: 20px;
         font-weight: bold;
+        background-color: #2C2C2E;
+        color: white;
+        border: none;
     }
 </style>
 """, unsafe_allow_html=True)
