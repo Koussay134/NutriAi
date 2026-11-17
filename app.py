@@ -189,7 +189,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["📸 Diario", "⭐ Preferiti", "⚙️ Target & Storico"])
+tab1, tab2, tab3 = st.tabs(["Oggi", "Preferiti", "Impostazioni"])
 
 # ==========================================
 # TAB 1: DIARIO E SCANNER AI
@@ -283,13 +283,40 @@ with tab1:
             """, unsafe_allow_html=True)
         else:
             for pasto in pasti_oggi:
-                with st.expander(f"🍽️ {pasto['nome']}  —  {pasto['cal']} kcal"):
-                    st.markdown(render_macro_bar(pasto['pro'], pasto['carb'], pasto['fat']), unsafe_allow_html=True)
-                    st.markdown(f"<div style='display:flex; justify-content:space-between; font-size:12px; color:#94A3B8; margin-bottom:15px;'><span>{pasto['pro']}g Pro</span><span>{pasto['carb']}g Carb</span><span>{pasto['fat']}g Fat</span></div>", unsafe_allow_html=True)
-                    if st.button("🗑️ Elimina Pasto", key=f"del_{pasto['id']}"):
+                # Calcolo percentuali macro per la barretta in stile Apple
+                tot_m = (pasto['pro'] * 4) + (pasto['carb'] * 4) + (pasto['fat'] * 9)
+                p_pro = (pasto['pro'] * 4 / tot_m * 100) if tot_m > 0 else 0
+                p_carb = (pasto['carb'] * 4 / tot_m * 100) if tot_m > 0 else 0
+                p_fat = (pasto['fat'] * 9 / tot_m * 100) if tot_m > 0 else 0
+                
+                html_pasto = f"""
+                <div style="background-color: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="color: #FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">{pasto['nome']}</div>
+                        <div style="color: #FA114F; font-size: 18px; font-weight: 800;">{pasto['cal']} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8E8E93; font-weight: 600; margin-bottom: 10px;">
+                        <span><span style="color:#C462FF;">●</span> {pasto['carb']}g C</span>
+                        <span><span style="color:#00E5FF;">●</span> {pasto['pro']}g P</span>
+                        <span><span style="color:#B4FF00;">●</span> {pasto['fat']}g F</span>
+                    </div>
+                    <div style="width: 100%; height: 4px; border-radius: 2px; display: flex; overflow: hidden; background-color: #2C2C2E;">
+                        <div style="width: {p_carb}%; background-color: #C462FF;"></div>
+                        <div style="width: {p_pro}%; background-color: #00E5FF;"></div>
+                        <div style="width: {p_fat}%; background-color: #B4FF00;"></div>
+                    </div>
+                </div>
+                """
+                st.markdown(html_pasto, unsafe_allow_html=True)
+                
+                # Bottone elimina compatto, spinto tutto a destra
+                c1, c2, c3 = st.columns([3, 1, 1])
+                with c3:
+                    if st.button("Elimina", key=f"del_{pasto['id']}", use_container_width=True):
                         storico = [p for p in storico if p["id"] != pasto["id"]]
                         salva_dati(FILE_STORICO, storico)
                         st.rerun()
+                st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
 
     # --- REVISIONE E MODIFICA RAPIDA (DRAFT MEAL) ---
     else:
