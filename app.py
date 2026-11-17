@@ -95,6 +95,7 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat):
     perc_cal = min((cal / t_cal) * 100, 100) if t_cal > 0 else 0
     perc_carb = min((carb / t_carb) * 100, 100) if t_carb > 0 else 0
     perc_pro = min((pro / t_pro) * 100, 100) if t_pro > 0 else 0
+    perc_fat = min((fat / t_fat) * 100, 100) if t_fat > 0 else 0
     
     c_cal = "#FA114F"
     c_carb = "#C462FF"
@@ -108,41 +109,31 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat):
         <div style="position: absolute; color: {c_cal}; font-size: 24px; font-weight: bold;">➔</div>
     </div>
     <div>
-        <div style="color: #FFFFFF; font-size: 16px; font-weight: 500; margin-bottom: 2px;">Movimento</div>
-        <div style="color: {c_cal}; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">{cal}<span style="font-size: 16px; font-weight: 600;">/{t_cal} KCAL</span></div>
+        <div style="color: #FFFFFF; font-size: 16px; font-weight: 500; margin-bottom: 2px;">Calorie</div>
+        <div style="color: {c_cal}; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">{cal}<span style="font-size: 16px; font-weight: 600; color: #8E8E93;"> /{t_cal} KCAL</span></div>
     </div>
 </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
     <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 5px;">Carboidrati <span style="color:#8E8E93; font-size:12px; float:right;">></span></div>
-        <div style="color: #8E8E93; font-size: 12px; margin-bottom: 8px;">Oggi</div>
-        <div style="color: {c_carb}; font-size: 24px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{carb} <span style="font-size:14px; font-weight:600;">g</span></div>
+        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Carboidrati</div>
+        <div style="color: {c_carb}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{carb}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_carb}g</span></div>
         <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
             <div style="width: {perc_carb}%; height: 100%; background-color: {c_carb};"></div>
         </div>
     </div>
     <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 5px;">Proteine <span style="color:#8E8E93; font-size:12px; float:right;">></span></div>
-        <div style="color: #8E8E93; font-size: 12px; margin-bottom: 8px;">Oggi</div>
-        <div style="color: {c_pro}; font-size: 24px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{pro} <span style="font-size:14px; font-weight:600;">g</span></div>
+        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Proteine</div>
+        <div style="color: {c_pro}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{pro}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_pro}g</span></div>
         <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
             <div style="width: {perc_pro}%; height: 100%; background-color: {c_pro};"></div>
         </div>
     </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 8px;">Grassi <span style="color:#8E8E93; font-size:12px; float:right;">></span></div>
-        <div style="color: {c_fat}; margin-bottom: 4px; font-size: 12px;">●</div>
-        <div style="color: #E2E8F0; font-size: 13px; margin-bottom: 4px;">Quota lipidica</div>
-        <div style="color: {c_fat}; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">{fat} <span style="font-size:14px; font-weight:600;">G</span></div>
-    </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-        <div style="position: absolute; top: 15px; left: 15px; color: #FFFFFF; font-size: 15px; font-weight: 600;">Obiettivo <span style="color:#8E8E93; font-size:12px; float:right; margin-left:45px;">></span></div>
-        <div style="margin-top: 25px; width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #FF9500, #FF5E3A); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(255,94,58,0.3);">
-            <div style="width: 35px; height: 35px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;">
-                <span style="color: white; font-size: 18px; font-weight: bold;">{"✓" if cal <= t_cal else "!"}</span>
-            </div>
+    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; grid-column: span 2;">
+        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Grassi</div>
+        <div style="color: {c_fat}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{fat}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_fat}g</span></div>
+        <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
+            <div style="width: {perc_fat}%; height: 100%; background-color: {c_fat};"></div>
         </div>
-        <div style="color: #8E8E93; font-size: 11px; margin-top: 10px; text-align: center;">{"In target" if cal <= t_cal else "Sforato"}</div>
     </div>
 </div>
 </div>"""
