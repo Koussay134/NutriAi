@@ -450,35 +450,54 @@ with tab1:
 # TAB 2: PREFERITI (1-TAP LOGGING)
 # ==========================================
 with tab2:
-    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600;'>Pasti Ricorrenti</h4>", unsafe_allow_html=True)
-    st.write("Aggiungi i tuoi pasti frequenti con un solo tap senza scattare foto.")
+    st.markdown("<h3 style='color: #FFFFFF; font-weight: 700; margin-bottom: 20px; font-size: 22px;'>Pasti Preferiti</h3>", unsafe_allow_html=True)
     
-    if not preferiti:
-        st.info("Nessun pasto preferito. Salva un pasto nei preferiti durante la revisione.")
+    if len(preferiti) == 0:
+        st.info("Nessun pasto salvato. Usa il tasto '⭐ Salva' nei pasti di oggi per aggiungerli qui.")
     else:
-        for pref in preferiti:
-            st.markdown(f"""
-            <div style="background-color: #161B26; padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight: 800; color: #E2E8F0;">{pref['nome']}</span>
-                    <span style="color: #10B981; font-weight: 800;">{pref['cal']} kcal</span>
+        for f_pasto in preferiti:
+            html_fav = f"""
+            <div style="background-color: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="color: #FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">{f_pasto['nome']}</div>
+                    <div style="color: #FA114F; font-size: 18px; font-weight: 800;">{f_pasto['cal']} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
                 </div>
-                <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">{pref['pro']}g Pro • {pref['carb']}g Carb • {pref['fat']}g Fat</div>
+                <div style="display: flex; gap: 15px; font-size: 12px; color: #8E8E93; font-weight: 600;">
+                    <span><span style="color:#C462FF;">●</span> {f_pasto['carb']}g C</span>
+                    <span><span style="color:#00E5FF;">●</span> {f_pasto['pro']}g P</span>
+                    <span><span style="color:#B4FF00;">●</span> {f_pasto['fat']}g F</span>
+                </div>
             </div>
-            """, unsafe_allow_html=True)
+            """
+            st.markdown(html_fav, unsafe_allow_html=True)
+            
+            # Bottoni compatti stile Apple
             c1, c2 = st.columns([3, 1])
-            if c1.button("➕ Aggiungi al Diario di Oggi", key=f"add_{pref['id']}", type="primary", use_container_width=True):
-                nuovo_pasto = pref.copy()
-                nuovo_pasto["id"] = str(uuid.uuid4())
-                nuovo_pasto["data"] = oggi
-                storico.append(nuovo_pasto)
-                salva_dati(FILE_STORICO, storico)
-                st.rerun()
-            if c2.button("🗑️", key=f"del_pref_{pref['id']}", use_container_width=True):
-                preferiti = [p for p in preferiti if p["id"] != pref["id"]]
-                salva_dati(FILE_PREFERITI, preferiti)
-                st.rerun()
-
+            with c1:
+                if st.button("➕ Aggiungi a Oggi", key=f"add_fav_{f_pasto['id']}", use_container_width=True):
+                    # Generiamo un ID univoco basato sul tempo per evitare conflitti
+                    nuovo_id = "pasto_" + str(int(datetime.now().timestamp() * 1000))
+                    nuovo_pasto = {
+                        "id": nuovo_id,
+                        "data": oggi,
+                        "nome": f_pasto["nome"],
+                        "cal": f_pasto["cal"],
+                        "pro": f_pasto["pro"],
+                        "carb": f_pasto["carb"],
+                        "fat": f_pasto["fat"]
+                    }
+                    storico.append(nuovo_pasto)
+                    salva_dati(FILE_STORICO, storico)
+                    st.toast(f"{f_pasto['nome']} aggiunto a Oggi!", icon="✅")
+                    # Ricarica per mostrare subito il cambiamento nel tab Oggi
+                    st.rerun()
+            with c2:
+                if st.button("Elimina", key=f"del_fav_{f_pasto['id']}", use_container_width=True):
+                    preferiti = [p for p in preferiti if p["id"] != f_pasto["id"]]
+                    salva_dati(FILE_PREFERITI, preferiti)
+                    st.rerun()
+            
+            st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
 # ==========================================
 # TAB 3: TARGET & STORICO
 # ==========================================
