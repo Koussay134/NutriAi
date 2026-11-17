@@ -440,5 +440,37 @@ with tab3:
             st.rerun()
 
 with tab4:
-    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600;'>Storico Passato</h4>", unsafe_allow_html=True)
-    st.info("Qui a breve costruiremo la schermata con i riepiloghi dei giorni passati.")
+    st.markdown("<h3 style='color: #FFFFFF; font-weight: 700; margin-bottom: 20px; font-size: 22px;'>Analisi Settimanale</h3>", unsafe_allow_html=True)
+    
+    # 1. QUI ANDRÀ IL GRAFICO A BARRE (Lo aggiungiamo dopo aver visto se ti piace la griglia)
+    st.markdown("<div style='height: 150px; background-color: #1C1C1E; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; color: #8E8E93;'>[Grafico a Barre in arrivo]</div>", unsafe_allow_html=True)
+
+    # 2. LE MEDIE SETTIMANALI (Stile Apple)
+    # Valori finti temporanei per farti vedere la grafica
+    media_cal, media_carb, media_pro, media_fat = 2450, 260, 145, 80 
+    
+    st.markdown(f"""
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px;">
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Calorie</div>
+            <div style="color: #FA114F; font-size: 24px; font-weight: 800;">{media_cal} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">kcal</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Carbo</div>
+            <div style="color: #C462FF; font-size: 24px; font-weight: 800;">{media_carb} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Proteine</div>
+            <div style="color: #00E5FF; font-size: 24px; font-weight: 800;">{media_pro} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Grassi</div>
+            <div style="color: #B4FF00; font-size: 24px; font-weight: 800;">{media_fat} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 3. LA MACCHINA DEL TEMPO
+    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 10px; font-size: 18px;'>Esplora Giorni Passati</h4>", unsafe_allow_html=True)
+    giorno_selezionato = st.date_input("Seleziona una data", value=datetime.now())
+    st.info("Qui comparirà il cruscotto di quel giorno esatto con tutti i pasti consumati.")
