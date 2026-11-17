@@ -109,7 +109,7 @@ tot_pro = sum(p["pro"] for p in pasti_oggi)
 tot_carb = sum(p["carb"] for p in pasti_oggi)
 tot_fat = sum(p["fat"] for p in pasti_oggi)
 
-def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat):
+def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat, streak=0):
     perc_cal = min((cal / t_cal) * 100, 100) if t_cal > 0 else 0
     perc_carb = min((carb / t_carb) * 100, 100) if t_carb > 0 else 0
     perc_pro = min((pro / t_pro) * 100, 100) if t_pro > 0 else 0
@@ -120,8 +120,23 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat):
     c_pro = "#00E5FF"
     c_fat = "#B4FF00"
     
+    # Funzione interna per calcolare cosa manca e scriverlo in modo elegante
+    def testo_mancante(attuale, target):
+        diff = target - attuale
+        if diff > 0:
+            return f"MANCANO {int(diff)}G"
+        elif diff < 0:
+            return f"<span style='color: #FF3366;'>+{int(abs(diff))}G EXTRA</span>"
+        return "COMPLETATO"
+
+    # Il badge della Streak (invisibile se è a 0 o se siamo nella macchina del tempo dello Storico)
+    badge_streak = f"""<div style="position: absolute; top: 15px; right: 15px; background: rgba(255, 149, 0, 0.1); border: 1px solid rgba(255, 149, 0, 0.3); color: #FF9500; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;">🔥 {streak} STREAK</div>""" if streak > 0 else ""
+
     html = f"""<div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
-<div style="background-color: #1C1C1E; border-radius: 20px; padding: 20px; display: flex; align-items: center;">
+<div style="background-color: #1C1C1E; border-radius: 20px; padding: 20px; display: flex; align-items: center; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+    
+    {badge_streak}
+    
     <div style="position: relative; width: 75px; height: 75px; border-radius: 50%; background: conic-gradient({c_cal} {perc_cal}%, #330010 0); display: flex; align-items: center; justify-content: center; margin-right: 20px;">
         <div style="width: 53px; height: 53px; border-radius: 50%; background-color: #1C1C1E;"></div>
         <div style="position: absolute; color: {c_cal}; font-size: 24px; font-weight: bold;">➔</div>
@@ -132,22 +147,31 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat):
     </div>
 </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Carboidrati</div>
+    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Carboidrati</div>
+            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(carb, t_carb)}</div>
+        </div>
         <div style="color: {c_carb}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{carb}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_carb}g</span></div>
         <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
             <div style="width: {perc_carb}%; height: 100%; background-color: {c_carb};"></div>
         </div>
     </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Proteine</div>
+    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Proteine</div>
+            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(pro, t_pro)}</div>
+        </div>
         <div style="color: {c_pro}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{pro}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_pro}g</span></div>
         <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
             <div style="width: {perc_pro}%; height: 100%; background-color: {c_pro};"></div>
         </div>
     </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; grid-column: span 2;">
-        <div style="color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 12px;">Grassi</div>
+    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; grid-column: span 2; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Grassi</div>
+            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(fat, t_fat)}</div>
+        </div>
         <div style="color: {c_fat}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{fat}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_fat}g</span></div>
         <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
             <div style="width: {perc_fat}%; height: 100%; background-color: {c_fat};"></div>
@@ -195,7 +219,30 @@ tab1, tab2, tab3, tab4 = st.tabs(["Oggi", "Preferiti", "Impostazioni", "Storico"
 # TAB 1: DIARIO E SCANNER AI
 # ==========================================
 with tab1:
-    st.markdown(render_apple_dashboard(tot_cal, tot_pro, tot_carb, tot_fat, impostazioni['target_cal'], impostazioni['target_pro'], impostazioni['target_carb'], impostazioni['target_fat']), unsafe_allow_html=True)
+    # CALCOLO STREAK DI TRACCIAMENTO
+    giorni_tracciati = set([p["data"] for p in storico])
+    data_curr = datetime.now().date()
+    streak_count = 0
+    
+    # Se hai già salvato qualcosa oggi, calcola partendo da oggi, altrimenti parti da ieri
+    if str(data_curr) in giorni_tracciati:
+        streak_count += 1
+        data_curr -= timedelta(days=1)
+    else:
+        data_curr -= timedelta(days=1)
+        
+    # Torna indietro nel tempo e conta i giorni consecutivi
+    while str(data_curr) in giorni_tracciati:
+        streak_count += 1
+        data_curr -= timedelta(days=1)
+
+    # STAMPA LA DASHBOARD (con la streak e i grammi calcolati)
+    st.markdown(render_apple_dashboard(
+        tot_cal, tot_pro, tot_carb, tot_fat, 
+        impostazioni['target_cal'], impostazioni['target_pro'], 
+        impostazioni['target_carb'], impostazioni['target_fat'], 
+        streak=streak_count
+    ), unsafe_allow_html=True)    
     if st.session_state.draft_meal is None:
         st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-top: 15px; margin-bottom: 10px;'>Aggiungi Pasto o Prodotto</h4>", unsafe_allow_html=True)
         nota_utente = st.text_input("Nota rapida (es. '200g crudo', o 'Ne ho mangiati 50g')", placeholder="Aggiungi contesto per l'IA...")
