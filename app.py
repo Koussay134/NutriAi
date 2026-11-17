@@ -120,7 +120,6 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat, str
     c_pro = "#00E5FF"
     c_fat = "#B4FF00"
     
-    # Funzione interna per calcolare cosa manca e scriverlo in modo elegante
     def testo_mancante(attuale, target):
         diff = target - attuale
         if diff > 0:
@@ -129,54 +128,51 @@ def render_apple_dashboard(cal, pro, carb, fat, t_cal, t_pro, t_carb, t_fat, str
             return f"<span style='color: #FF3366;'>+{int(abs(diff))}G EXTRA</span>"
         return "COMPLETATO"
 
-    # Il badge della Streak (invisibile se è a 0 o se siamo nella macchina del tempo dello Storico)
     badge_streak = f"""<div style="position: absolute; top: 15px; right: 15px; background: rgba(255, 149, 0, 0.1); border: 1px solid rgba(255, 149, 0, 0.3); color: #FF9500; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;">🔥 {streak} STREAK</div>""" if streak > 0 else ""
 
     html = f"""<div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
 <div style="background-color: #1C1C1E; border-radius: 20px; padding: 20px; display: flex; align-items: center; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-    
-    {badge_streak}
-    
-    <div style="position: relative; width: 75px; height: 75px; border-radius: 50%; background: conic-gradient({c_cal} {perc_cal}%, #330010 0); display: flex; align-items: center; justify-content: center; margin-right: 20px;">
-        <div style="width: 53px; height: 53px; border-radius: 50%; background-color: #1C1C1E;"></div>
-        <div style="position: absolute; color: {c_cal}; font-size: 24px; font-weight: bold;">➔</div>
-    </div>
-    <div>
-        <div style="color: #FFFFFF; font-size: 16px; font-weight: 500; margin-bottom: 2px;">Calorie</div>
-        <div style="color: {c_cal}; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">{cal}<span style="font-size: 16px; font-weight: 600; color: #8E8E93;"> /{t_cal} KCAL</span></div>
-    </div>
+{badge_streak}
+<div style="position: relative; width: 75px; height: 75px; border-radius: 50%; background: conic-gradient({c_cal} {perc_cal}%, #330010 0); display: flex; align-items: center; justify-content: center; margin-right: 20px;">
+<div style="width: 53px; height: 53px; border-radius: 50%; background-color: #1C1C1E;"></div>
+<div style="position: absolute; color: {c_cal}; font-size: 24px; font-weight: bold;">➔</div>
+</div>
+<div>
+<div style="color: #FFFFFF; font-size: 16px; font-weight: 500; margin-bottom: 2px;">Calorie</div>
+<div style="color: {c_cal}; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">{cal}<span style="font-size: 16px; font-weight: 600; color: #8E8E93;"> /{t_cal} KCAL</span></div>
+</div>
 </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
-            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Carboidrati</div>
-            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(carb, t_carb)}</div>
-        </div>
-        <div style="color: {c_carb}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{carb}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_carb}g</span></div>
-        <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
-            <div style="width: {perc_carb}%; height: 100%; background-color: {c_carb};"></div>
-        </div>
-    </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
-            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Proteine</div>
-            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(pro, t_pro)}</div>
-        </div>
-        <div style="color: {c_pro}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{pro}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_pro}g</span></div>
-        <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
-            <div style="width: {perc_pro}%; height: 100%; background-color: {c_pro};"></div>
-        </div>
-    </div>
-    <div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; grid-column: span 2; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
-            <div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Grassi</div>
-            <div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(fat, t_fat)}</div>
-        </div>
-        <div style="color: {c_fat}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{fat}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_fat}g</span></div>
-        <div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
-            <div style="width: {perc_fat}%; height: 100%; background-color: {c_fat};"></div>
-        </div>
-    </div>
+<div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+<div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Carboidrati</div>
+<div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(carb, t_carb)}</div>
+</div>
+<div style="color: {c_carb}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{carb}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_carb}g</span></div>
+<div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
+<div style="width: {perc_carb}%; height: 100%; background-color: {c_carb};"></div>
+</div>
+</div>
+<div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+<div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Proteine</div>
+<div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(pro, t_pro)}</div>
+</div>
+<div style="color: {c_pro}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{pro}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_pro}g</span></div>
+<div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
+<div style="width: {perc_pro}%; height: 100%; background-color: {c_pro};"></div>
+</div>
+</div>
+<div style="background-color: #1C1C1E; border-radius: 20px; padding: 15px; grid-column: span 2; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+<div style="color: #FFFFFF; font-size: 15px; font-weight: 600;">Grassi</div>
+<div style="color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">{testo_mancante(fat, t_fat)}</div>
+</div>
+<div style="color: {c_fat}; font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;">{fat}<span style="color: #8E8E93; font-size:14px; font-weight:600;"> /{t_fat}g</span></div>
+<div style="width: 100%; height: 5px; background-color: #2C2C2E; border-radius: 3px; overflow: hidden;">
+<div style="width: {perc_fat}%; height: 100%; background-color: {c_fat};"></div>
+</div>
+</div>
 </div>
 </div>"""
     return html
