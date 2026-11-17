@@ -55,14 +55,32 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] { gap: 10px; background-color: #0B0F17; }
-    .stTabs [data-baseweb="tab"] {
-        background-color: #161B26; border: 1px solid rgba(255,255,255,0.05);
-        border-bottom: none; border-radius: 12px 12px 0 0; padding: 10px 20px; color: #94A3B8;
+    /* Tabs stile Apple Segmented Control (Occupano tutta la riga) */
+    .stTabs [data-baseweb="tab-list"] { 
+        display: flex;
+        width: 100%;
+        background-color: #1C1C1E;
+        border-radius: 12px;
+        padding: 4px;
+        gap: 2px;
     }
-    .stTabs [aria-selected="true"] { background-color: #10B981 !important; color: #0B0F17 !important; font-weight: 800 !important; }
-</style>
+    .stTabs [data-baseweb="tab"] {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        background-color: transparent;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 0px; 
+        color: #8E8E93;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .stTabs [aria-selected="true"] { 
+        background-color: #2C2C2E !important;
+        color: #FFFFFF !important; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    }</style>
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIONE DATI PERMANENTI ---
