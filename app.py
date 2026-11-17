@@ -189,7 +189,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["Oggi", "Preferiti", "Impostazioni"])
+tab1, tab2, tab3, tab4 = st.tabs(["Oggi", "Preferiti", "Impostazioni", "Storico"])
 
 # ==========================================
 # TAB 1: DIARIO E SCANNER AI
@@ -438,3 +438,7 @@ with tab3:
             salva_dati(FILE_IMPOSTAZIONI, impostazioni)
             st.success("Target aggiornati!")
             st.rerun()
+
+with tab4:
+    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600;'>Storico Passato</h4>", unsafe_allow_html=True)
+    st.info("Qui a breve costruiremo la schermata con i riepiloghi dei giorni passati.")
