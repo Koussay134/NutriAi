@@ -502,16 +502,109 @@ with tab2:
 # TAB 3: TARGET & STORICO
 # ==========================================
 with tab3:
-    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600;'>Obiettivi Nutrizionali</h4>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #FFFFFF; font-weight: 700; margin-bottom: 20px; font-size: 22px;'>Impostazioni e Profilo</h3>", unsafe_allow_html=True)
+    
+    # 1. LETTURA DATI ATTUALI (Valori di default ottimizzati al primo avvio)
+    peso_attuale = impostazioni.get("peso", 72.0)
+    altezza_attuale = impostazioni.get("altezza", 181)
+    eta_attuale = impostazioni.get("eta", 20)
+    sesso_attuale = impostazioni.get("sesso", "Uomo")
+    livello_att = impostazioni.get("attivita", 1.55) # Default: Moderatamente attivo
+    
+    # 2. MOTORE DI CALCOLO BIOMETRICO (Mifflin-St Jeor + Deurenberg)
+    bmi = peso_attuale / ((altezza_attuale / 100) ** 2) if altezza_attuale > 0 else 0
+    
+    if sesso_attuale == "Uomo":
+        bf_stimato = (1.20 * bmi) + (0.23 * eta_attuale) - 16.2
+        bmr = (10 * peso_attuale) + (6.25 * altezza_attuale) - (5 * eta_attuale) + 5
+    else:
+        bf_stimato = (1.20 * bmi) + (0.23 * eta_attuale) - 5.4
+        bmr = (10 * peso_attuale) + (6.25 * altezza_attuale) - (5 * eta_attuale) - 161
+        
+    bf_stimato = max(5.0, min(bf_stimato, 50.0)) # Limiti di sicurezza per il calcolo
+    tdee = bmr * livello_att
+    
+    # 3. DASHBOARD STATISTICHE CORPOREE
+    st.markdown(f"""
+    <div style="background-color: #1C1C1E; border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="color: #FFFFFF; font-size: 16px; font-weight: 600; margin-bottom: 15px;">📊 Statistiche Corporee (Stimate)</div>
+        <div style="display: flex; justify-content: space-between; text-align: center;">
+            <div>
+                <div style="color: #8E8E93; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">BMR (Basale)</div>
+                <div style="color: #FFFFFF; font-size: 22px; font-weight: 700;">{int(bmr)} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
+            </div>
+            <div style="border-left: 1px solid #2C2C2E; border-right: 1px solid #2C2C2E; padding: 0 15px;">
+                <div style="color: #8E8E93; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">TDEE (Consumo)</div>
+                <div style="color: #FA114F; font-size: 22px; font-weight: 700;">{int(tdee)} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
+            </div>
+            <div>
+                <div style="color: #8E8E93; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Massa Grassa</div>
+                <div style="color: #00E5FF; font-size: 22px; font-weight: 700;">{bf_stimato:.1f} <span style="font-size: 12px; color: #8E8E93;">%</span></div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 4. FORM DI MODIFICA
     with st.form("form_impostazioni"):
-        new_cal = st.number_input("Target Calorie (kcal)", value=impostazioni['target_cal'], step=50)
-        new_pro = st.number_input("Target Proteine (g)", value=impostazioni['target_pro'], step=5)
-        new_carb = st.number_input("Target Carboidrati (g)", value=impostazioni['target_carb'], step=5)
-        new_fat = st.number_input("Target Grassi (g)", value=impostazioni['target_fat'], step=5)
-        if st.form_submit_button("Salva Impostazioni"):
-            impostazioni.update({"target_cal": new_cal, "target_pro": new_pro, "target_carb": new_carb, "target_fat": new_fat})
+        st.markdown("<h4 style='color: #FFFFFF; font-size: 16px; font-weight: 600; margin-bottom: 15px;'>👤 I Tuoi Dati</h4>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        new_peso = c1.number_input("Peso (kg)", value=float(peso_attuale), step=0.1)
+        new_alt = c2.number_input("Altezza (cm)", value=int(altezza_attuale), step=1)
+        new_eta = c3.number_input("Età", value=int(eta_attuale), step=1)
+        
+        c4, c5 = st.columns([1, 2])
+        new_sesso = c4.selectbox("Sesso", ["Uomo", "Donna"], index=0 if sesso_attuale=="Uomo" else 1)
+        
+        # Dizionario Moltiplicatori Attività
+        livelli_att = {
+            "Sedentario (scrivania, poco moto)": 1.2,
+            "Leggero (1-3 workout a settimana)": 1.375,
+            "Moderato (3-5 workout a settimana)": 1.55,
+            "Attivo (6-7 workout a settimana)": 1.725,
+            "Molto Attivo (lavoro fisico + workout)": 1.9
+        }
+        att_index = list(livelli_att.values()).index(livello_att) if livello_att in livelli_att.values() else 2
+        nome_att = c5.selectbox("Stile di Vita", list(livelli_att.keys()), index=att_index)
+        new_att = livelli_att[nome_att]
+        
+        st.markdown("<hr style='border-top: 1px solid #2C2C2E; margin: 25px 0;'>", unsafe_allow_html=True)
+        
+        st.markdown("<h4 style='color: #FFFFFF; font-size: 16px; font-weight: 600; margin-bottom: 20px;'>🎯 Obiettivi Nutrizionali</h4>", unsafe_allow_html=True)
+        
+        # Griglia colorata per i macro
+        mc1, mc2 = st.columns(2)
+        with mc1:
+            st.markdown("<div style='color: #FA114F; font-size: 13px; font-weight: 600; margin-bottom: 5px;'>Calorie (kcal)</div>", unsafe_allow_html=True)
+            new_cal = st.number_input("Calorie", value=impostazioni.get('target_cal', 2800), step=50, label_visibility="collapsed")
+            
+            st.markdown("<div style='color: #00E5FF; font-size: 13px; font-weight: 600; margin-bottom: 5px; margin-top: 10px;'>Proteine (g)</div>", unsafe_allow_html=True)
+            new_pro = st.number_input("Proteine", value=impostazioni.get('target_pro', 160), step=5, label_visibility="collapsed")
+            
+        with mc2:
+            st.markdown("<div style='color: #C462FF; font-size: 13px; font-weight: 600; margin-bottom: 5px;'>Carboidrati (g)</div>", unsafe_allow_html=True)
+            new_carb = st.number_input("Carboidrati", value=impostazioni.get('target_carb', 350), step=5, label_visibility="collapsed")
+            
+            st.markdown("<div style='color: #B4FF00; font-size: 13px; font-weight: 600; margin-bottom: 5px; margin-top: 10px;'>Grassi (g)</div>", unsafe_allow_html=True)
+            new_fat = st.number_input("Grassi", value=impostazioni.get('target_fat', 80), step=5, label_visibility="collapsed")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        submit = st.form_submit_button("💾 Salva Impostazioni e Aggiorna Profilo", type="primary", use_container_width=True)
+        
+        if submit:
+            impostazioni.update({
+                "peso": new_peso,
+                "altezza": new_alt,
+                "eta": new_eta,
+                "sesso": new_sesso,
+                "attivita": new_att,
+                "target_cal": new_cal,
+                "target_pro": new_pro,
+                "target_carb": new_carb,
+                "target_fat": new_fat
+            })
             salva_dati(FILE_IMPOSTAZIONI, impostazioni)
-            st.success("Target aggiornati!")
+            st.toast("Profilo e Obiettivi salvati con successo!", icon="✅")
             st.rerun()
 
 with tab4:
