@@ -283,41 +283,75 @@ with tab1:
             """, unsafe_allow_html=True)
         else:
             for pasto in pasti_oggi:
-                # Calcolo percentuali macro per la barretta in stile Apple
-                tot_m = (pasto['pro'] * 4) + (pasto['carb'] * 4) + (pasto['fat'] * 9)
-                p_pro = (pasto['pro'] * 4 / tot_m * 100) if tot_m > 0 else 0
-                p_carb = (pasto['carb'] * 4 / tot_m * 100) if tot_m > 0 else 0
-                p_fat = (pasto['fat'] * 9 / tot_m * 100) if tot_m > 0 else 0
+                # 1. MODALITÀ MODIFICA (Se l'utente ha cliccato il tasto Modifica per questo pasto)
+                if st.session_state.get("edit_pasto_id") == pasto["id"]:
+                    with st.form(key=f"form_edit_{pasto['id']}"):
+                        st.markdown("<h4 style='color: white; margin-top: 0; font-size: 16px;'>✏️ Modifica Pasto</h4>", unsafe_allow_html=True)
+                        nuovo_nome = st.text_input("Nome Pasto", value=pasto["nome"])
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        nuove_cal = col1.number_input("Kcal", value=pasto["cal"], step=10)
+                        nuove_carb = col2.number_input("Carbo (g)", value=pasto["carb"], step=1)
+                        nuove_pro = col3.number_input("Pro (g)", value=pasto["pro"], step=1)
+                        nuovi_fat = col4.number_input("Grassi (g)", value=pasto["fat"], step=1)
+                        
+                        c_salva, c_annulla = st.columns(2)
+                        if c_salva.form_submit_button("💾 Salva", type="primary", use_container_width=True):
+                            # Aggiorniamo il JSON
+                            for i, p in enumerate(storico):
+                                if p["id"] == pasto["id"]:
+                                    storico[i]["nome"] = nuovo_nome
+                                    storico[i]["cal"] = nuove_cal
+                                    storico[i]["carb"] = nuove_carb
+                                    storico[i]["pro"] = nuove_pro
+                                    storico[i]["fat"] = nuovi_fat
+                            salva_dati(FILE_STORICO, storico)
+                            st.session_state["edit_pasto_id"] = None
+                            st.rerun()
+                        
+                        if c_annulla.form_submit_button("❌ Annulla", use_container_width=True):
+                            st.session_state["edit_pasto_id"] = None
+                            st.rerun()
                 
-                html_pasto = f"""
-                <div style="background-color: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <div style="color: #FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">{pasto['nome']}</div>
-                        <div style="color: #FA114F; font-size: 18px; font-weight: 800;">{pasto['cal']} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
+                # 2. MODALITÀ LETTURA (Rendering normale della Card)
+                else:
+                    tot_m = (pasto['pro'] * 4) + (pasto['carb'] * 4) + (pasto['fat'] * 9)
+                    p_pro = (pasto['pro'] * 4 / tot_m * 100) if tot_m > 0 else 0
+                    p_carb = (pasto['carb'] * 4 / tot_m * 100) if tot_m > 0 else 0
+                    p_fat = (pasto['fat'] * 9 / tot_m * 100) if tot_m > 0 else 0
+                    
+                    html_pasto = f"""
+                    <div style="background-color: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="color: #FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">{pasto['nome']}</div>
+                            <div style="color: #FA114F; font-size: 18px; font-weight: 800;">{pasto['cal']} <span style="font-size: 12px; color: #8E8E93;">kcal</span></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8E8E93; font-weight: 600; margin-bottom: 10px;">
+                            <span><span style="color:#C462FF;">●</span> {pasto['carb']}g C</span>
+                            <span><span style="color:#00E5FF;">●</span> {pasto['pro']}g P</span>
+                            <span><span style="color:#B4FF00;">●</span> {pasto['fat']}g F</span>
+                        </div>
+                        <div style="width: 100%; height: 4px; border-radius: 2px; display: flex; overflow: hidden; background-color: #2C2C2E;">
+                            <div style="width: {p_carb}%; background-color: #C462FF;"></div>
+                            <div style="width: {p_pro}%; background-color: #00E5FF;"></div>
+                            <div style="width: {p_fat}%; background-color: #B4FF00;"></div>
+                        </div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8E8E93; font-weight: 600; margin-bottom: 10px;">
-                        <span><span style="color:#C462FF;">●</span> {pasto['carb']}g C</span>
-                        <span><span style="color:#00E5FF;">●</span> {pasto['pro']}g P</span>
-                        <span><span style="color:#B4FF00;">●</span> {pasto['fat']}g F</span>
-                    </div>
-                    <div style="width: 100%; height: 4px; border-radius: 2px; display: flex; overflow: hidden; background-color: #2C2C2E;">
-                        <div style="width: {p_carb}%; background-color: #C462FF;"></div>
-                        <div style="width: {p_pro}%; background-color: #00E5FF;"></div>
-                        <div style="width: {p_fat}%; background-color: #B4FF00;"></div>
-                    </div>
-                </div>
-                """
-                st.markdown(html_pasto, unsafe_allow_html=True)
-                
-                # Bottone elimina compatto, spinto tutto a destra
-                c1, c2, c3 = st.columns([3, 1, 1])
-                with c3:
-                    if st.button("Elimina", key=f"del_{pasto['id']}", use_container_width=True):
-                        storico = [p for p in storico if p["id"] != pasto["id"]]
-                        salva_dati(FILE_STORICO, storico)
-                        st.rerun()
-                st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
-
+                    """
+                    st.markdown(html_pasto, unsafe_allow_html=True)
+                    
+                    # Aggiunta del bottone Modifica a fianco di Elimina
+                    c1, c2, c3 = st.columns([2, 1, 1])
+                    with c2:
+                        if st.button("Modifica", key=f"edit_{pasto['id']}", use_container_width=True):
+                            st.session_state["edit_pasto_id"] = pasto["id"]
+                            st.rerun()
+                    with c3:
+                        if st.button("Elimina", key=f"del_{pasto['id']}", use_container_width=True):
+                            storico = [p for p in storico if p["id"] != pasto["id"]]
+                            salva_dati(FILE_STORICO, storico)
+                            st.rerun()
+                    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
     # --- REVISIONE E MODIFICA RAPIDA (DRAFT MEAL) ---
     else:
         st.markdown("<h4 style='color: #10B981; font-weight: 800; margin-top: 20px;'>⚡ Modifica Rapida Porzioni</h4>", unsafe_allow_html=True)
