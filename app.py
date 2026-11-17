@@ -8,6 +8,21 @@ import uuid
 
 # --- 1. CONFIGURAZIONE APP E STATO ---
 st.set_page_config(page_title="NutriAI Pro", page_icon="📱", layout="centered")
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .stButton>button {
+        border-radius: 20px;
+        font-weight: bold;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 API_KEY = st.secrets["GEMINI_API_KEY"]
 FILE_STORICO = "database_pasti.json"
