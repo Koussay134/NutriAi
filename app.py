@@ -493,29 +493,28 @@ with tab4:
     media_pro = int(tot_pro_sett / giorni_tracciati) if tot_pro_sett > 0 else 0
     media_fat = int(tot_fat_sett / giorni_tracciati) if tot_fat_sett > 0 else 0
 
-    # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
-    target_k = impostazioni['target_cal']
+   # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
+    target_k = int(impostazioni.get('target_cal', 2800))
     barre_html = ""
-    max_val = max(max(grafico_valori) if grafico_valori else target_k, target_k)
-    max_val = max_val if max_val > 0 else 1 # sicurezza
+    
+    valore_max_grafico = max(grafico_valori) if len(grafico_valori) > 0 else 0
+    max_val = max(valore_max_grafico, target_k)
+    if max_val == 0:
+        max_val = 1
     
     for i, val in enumerate(grafico_valori):
         perc_h = (val / max_val) * 100
         is_over = val > target_k
-        colore = "#FF3366" if is_over else "#FA114F" # Leggermente diverso se sfora
+        colore = "#FF3366" if is_over else "#FA114F"
         opacita = "1" if val > 0 else "0.1"
-        barre_html += f"""
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 14%;">
-            <div style="height: {perc_h}%; width: 22px; background-color: {colore}; opacity: {opacita}; border-radius: 6px; margin-bottom: 8px;"></div>
-            <div style="color: #8E8E93; font-size: 11px; font-weight: 600;">{grafico_giorni[i]}</div>
-        </div>
-        """
+        barre_html += f"""<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 14%;">
+<div style="height: {perc_h}%; width: 22px; background-color: {colore}; opacity: {opacita}; border-radius: 6px; margin-bottom: 8px;"></div>
+<div style="color: #8E8E93; font-size: 11px; font-weight: 600;">{grafico_giorni[i]}</div>
+</div>"""
 
-    st.markdown(f"""
-    <div style="height: 180px; background-color: #1C1C1E; border-radius: 16px; padding: 20px 10px 10px 10px; display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        {barre_html}
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"""<div style="height: 180px; background-color: #1C1C1E; border-radius: 16px; padding: 20px 10px 10px 10px; display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+{barre_html}
+</div>""", unsafe_allow_html=True)
 
 
     # 3. LE MEDIE SETTIMANALI (Con i veri dati calcolati)
