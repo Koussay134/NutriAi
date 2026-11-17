@@ -494,4 +494,78 @@ with tab4:
     media_fat = int(tot_fat_sett / giorni_tracciati) if tot_fat_sett > 0 else 0
 
     # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
-    target_k
+    target_k = impostazioni['target_cal']
+    barre_html = ""
+    max_val = max(max(grafico_valori) if grafico_valori else target_k, target_k)
+    max_val = max_val if max_val > 0 else 1 # sicurezza
+    
+    for i, val in enumerate(grafico_valori):
+        perc_h = (val / max_val) * 100
+        is_over = val > target_k
+        colore = "#FF3366" if is_over else "#FA114F" # Leggermente diverso se sfora
+        opacita = "1" if val > 0 else "0.1"
+        barre_html += f"""
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 14%;">
+            <div style="height: {perc_h}%; width: 22px; background-color: {colore}; opacity: {opacita}; border-radius: 6px; margin-bottom: 8px;"></div>
+            <div style="color: #8E8E93; font-size: 11px; font-weight: 600;">{grafico_giorni[i]}</div>
+        </div>
+        """
+
+    st.markdown(f"""
+    <div style="height: 180px; background-color: #1C1C1E; border-radius: 16px; padding: 20px 10px 10px 10px; display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        {barre_html}
+    </div>
+    """, unsafe_allow_html=True)
+
+
+    # 3. LE MEDIE SETTIMANALI (Con i veri dati calcolati)
+    st.markdown(f"""
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px;">
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Calorie</div>
+            <div style="color: #FA114F; font-size: 24px; font-weight: 800;">{media_cal} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">kcal</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Carbo</div>
+            <div style="color: #C462FF; font-size: 24px; font-weight: 800;">{media_carb} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Proteine</div>
+            <div style="color: #00E5FF; font-size: 24px; font-weight: 800;">{media_pro} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Grassi</div>
+            <div style="color: #B4FF00; font-size: 24px; font-weight: 800;">{media_fat} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+    # 4. LA MACCHINA DEL TEMPO
+    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 10px; font-size: 18px;'>Esplora Giorni Passati</h4>", unsafe_allow_html=True)
+    giorno_sel = st.date_input("Seleziona una data", value=datetime.now())
+    
+    pasti_storico = [p for p in storico if p["data"] == str(giorno_sel)]
+    
+    if len(pasti_storico) > 0:
+        c_tot = sum(p["cal"] for p in pasti_storico)
+        p_tot = sum(p["pro"] for p in pasti_storico)
+        cb_tot = sum(p["carb"] for p in pasti_storico)
+        f_tot = sum(p["fat"] for p in pasti_storico)
+        
+        st.markdown(f"<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+        st.markdown(render_apple_dashboard(c_tot, p_tot, cb_tot, f_tot, impostazioni['target_cal'], impostazioni['target_pro'], impostazioni['target_carb'], impostazioni['target_fat']), unsafe_allow_html=True)
+        
+        st.markdown("<h4 style='color: #FFFFFF; font-size: 16px; font-weight: 600; margin-bottom: 15px;'>Pasti Consumati</h4>", unsafe_allow_html=True)
+        
+        for p in pasti_storico:
+            st.markdown(f"""
+            <div style="background-color: #1C1C1E; border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="color: #FFFFFF; font-size: 14px; font-weight: 600;">{p['nome']}</div>
+                    <div style="color: #FA114F; font-size: 16px; font-weight: 800;">{p['cal']} <span style="font-size: 10px; color: #8E8E93;">kcal</span></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Nessun pasto salvato per questa data.")
