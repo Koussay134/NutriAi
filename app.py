@@ -442,35 +442,56 @@ with tab3:
 with tab4:
     st.markdown("<h3 style='color: #FFFFFF; font-weight: 700; margin-bottom: 20px; font-size: 22px;'>Analisi Settimanale</h3>", unsafe_allow_html=True)
     
-    # 1. QUI ANDRÀ IL GRAFICO A BARRE (Lo aggiungiamo dopo aver visto se ti piace la griglia)
-    st.markdown("<div style='height: 150px; background-color: #1C1C1E; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; color: #8E8E93;'>[Grafico a Barre in arrivo]</div>", unsafe_allow_html=True)
-
-    # 2. LE MEDIE SETTIMANALI (Stile Apple)
-    # Valori finti temporanei per farti vedere la grafica
-    media_cal, media_carb, media_pro, media_fat = 2450, 260, 145, 80 
+    # 1. CALCOLO DATI REALI ULTIMI 7 GIORNI
+    giorni_salvati = {}
+    oggi_dt_calc = datetime.now().date()
     
-    st.markdown(f"""
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px;">
-        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Calorie</div>
-            <div style="color: #FA114F; font-size: 24px; font-weight: 800;">{media_cal} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">kcal</span></div>
-        </div>
-        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Carbo</div>
-            <div style="color: #C462FF; font-size: 24px; font-weight: 800;">{media_carb} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
-        </div>
-        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Proteine</div>
-            <div style="color: #00E5FF; font-size: 24px; font-weight: 800;">{media_pro} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
-        </div>
-        <div style="background-color: #1C1C1E; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-            <div style="color: #8E8E93; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Media Grassi</div>
-            <div style="color: #B4FF00; font-size: 24px; font-weight: 800;">{media_fat} <span style="font-size: 13px; color: #8E8E93; font-weight: 600;">g</span></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Raggruppiamo i pasti dello storico per data
+    for pasto in storico:
+        data_pasto = datetime.strptime(pasto["data"], "%Y-%m-%d").date()
+        giorni_diff = (oggi_dt_calc - data_pasto).days
+        
+        # Prendiamo solo gli ultimi 7 giorni (da oggi a 6 giorni fa)
+        if 0 <= giorni_diff <= 6:
+            g_str = pasto["data"]
+            if g_str not in giorni_salvati:
+                giorni_salvati[g_str] = {"cal": 0, "pro": 0, "carb": 0, "fat": 0}
+            
+            giorni_salvati[g_str]["cal"] += pasto["cal"]
+            giorni_salvati[g_str]["pro"] += pasto["pro"]
+            giorni_salvati[g_str]["carb"] += pasto["carb"]
+            giorni_salvati[g_str]["fat"] += pasto["fat"]
 
-    # 3. LA MACCHINA DEL TEMPO
-    st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 10px; font-size: 18px;'>Esplora Giorni Passati</h4>", unsafe_allow_html=True)
-    giorno_selezionato = st.date_input("Seleziona una data", value=datetime.now())
-    st.info("Qui comparirà il cruscotto di quel giorno esatto con tutti i pasti consumati.")
+    # Prepariamo array di 7 giorni per il grafico (ordinati dal più vecchio a oggi)
+    grafico_giorni = []
+    grafico_valori = []
+    
+    # Calcolo Medie
+    tot_cal_sett, tot_carb_sett, tot_pro_sett, tot_fat_sett = 0, 0, 0, 0
+    giorni_tracciati = len(giorni_salvati) if len(giorni_salvati) > 0 else 1 # Evita divisione per zero
+    
+    for i in range(6, -1, -1):
+        g_calc = oggi_dt_calc - timedelta(days=i)
+        g_calc_str = str(g_calc)
+        
+        # Etichetta asse X (es. "L", "M", "M", "G"...)
+        giorno_lettera = ["L", "M", "M", "G", "V", "S", "D"][g_calc.weekday()]
+        grafico_giorni.append(giorno_lettera)
+        
+        if g_calc_str in giorni_salvati:
+            dati_g = giorni_salvati[g_calc_str]
+            grafico_valori.append(dati_g["cal"])
+            tot_cal_sett += dati_g["cal"]
+            tot_carb_sett += dati_g["carb"]
+            tot_pro_sett += dati_g["pro"]
+            tot_fat_sett += dati_g["fat"]
+        else:
+            grafico_valori.append(0)
+
+    media_cal = int(tot_cal_sett / giorni_tracciati) if tot_cal_sett > 0 else 0
+    media_carb = int(tot_carb_sett / giorni_tracciati) if tot_carb_sett > 0 else 0
+    media_pro = int(tot_pro_sett / giorni_tracciati) if tot_pro_sett > 0 else 0
+    media_fat = int(tot_fat_sett / giorni_tracciati) if tot_fat_sett > 0 else 0
+
+    # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
+    target_k
