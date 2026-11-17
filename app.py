@@ -493,27 +493,49 @@ with tab4:
     media_pro = int(tot_pro_sett / giorni_tracciati) if tot_pro_sett > 0 else 0
     media_fat = int(tot_fat_sett / giorni_tracciati) if tot_fat_sett > 0 else 0
 
-   # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
+  # 2. GENERAZIONE GRAFICO A BARRE HTML/CSS
     target_k = int(impostazioni.get('target_cal', 2800))
     barre_html = ""
+    giorni_html = ""
     
     valore_max_grafico = max(grafico_valori) if len(grafico_valori) > 0 else 0
-    max_val = max(valore_max_grafico, target_k)
+    # Alziamo il tetto del grafico del 20% in modo che la barra più alta non sbatta sul soffitto
+    max_val = max(valore_max_grafico, target_k) * 1.2
     if max_val == 0:
         max_val = 1
+        
+    target_perc = (target_k / max_val) * 100
     
     for i, val in enumerate(grafico_valori):
         perc_h = (val / max_val) * 100
         is_over = val > target_k
         colore = "#FF3366" if is_over else "#FA114F"
-        opacita = "1" if val > 0 else "0.1"
-        barre_html += f"""<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 14%;">
-<div style="height: {perc_h}%; width: 22px; background-color: {colore}; opacity: {opacita}; border-radius: 6px; margin-bottom: 8px;"></div>
-<div style="color: #8E8E93; font-size: 11px; font-weight: 600;">{grafico_giorni[i]}</div>
+        
+        # Gestione giorni vuoti (per farti capire visivamente che ci sono 7 giorni)
+        if val == 0:
+            perc_h = 2 # Barra minima visibile per design
+            colore = "#2C2C2E" # Grigio scuro stile Apple
+            testo_val = ""
+        else:
+            testo_val = f"{val}"
+            
+        barre_html += f"""<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 14%; z-index: 2;">
+<div style="color: #FFFFFF; font-size: 10px; font-weight: 600; margin-bottom: 4px;">{testo_val}</div>
+<div style="height: {perc_h}%; width: 22px; background-color: {colore}; border-radius: 4px 4px 0 0;"></div>
 </div>"""
+        
+        giorni_html += f"""<div style="width: 14%; text-align: center; color: #8E8E93; font-size: 11px; font-weight: 600;">{grafico_giorni[i]}</div>"""
 
-    st.markdown(f"""<div style="height: 180px; background-color: #1C1C1E; border-radius: 16px; padding: 20px 10px 10px 10px; display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+    st.markdown(f"""<div style="background-color: #1C1C1E; border-radius: 16px; padding: 20px 15px 10px 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+<div style="position: relative; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid #2C2C2E;">
+<div style="position: absolute; bottom: {target_perc}%; left: 0; right: 0; border-bottom: 1px dashed rgba(255,255,255,0.2); z-index: 1;">
+<span style="position: absolute; left: 0; top: -16px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.5px;">TARGET {target_k}</span>
+</div>
 {barre_html}
+</div>
+<div style="display: flex; justify-content: space-between; padding-top: 10px;">
+{giorni_html}
+</div>
 </div>""", unsafe_allow_html=True)
 
 
