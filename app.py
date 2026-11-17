@@ -177,7 +177,17 @@ def render_macro_bar(pro, carb, fat):
 """
 
 # --- 4. INTERFACCIA A SCHEDE ---
-st.markdown("<h2 style='color: #FFFFFF; font-weight: 800; margin-bottom: 20px;'>🥗 NutriAI Pro</h2>", unsafe_allow_html=True)
+giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+mesi = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
+oggi_dt = datetime.now()
+data_formattata = f"{giorni[oggi_dt.weekday()]} {oggi_dt.day} {mesi[oggi_dt.month - 1]}"
+
+st.markdown(f"""
+<div style="margin-top: -50px; margin-bottom: 25px;">
+    <div style="font-size: 34px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px; line-height: 1.2;">Riepilogo</div>
+    <div style="font-size: 14px; font-weight: 600; color: #8E8E93;">{data_formattata}</div>
+</div>
+""", unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["📸 Diario", "⭐ Preferiti", "⚙️ Target & Storico"])
 
