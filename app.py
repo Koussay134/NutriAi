@@ -126,24 +126,23 @@ def render_macro_card(title, value, target, color_hex, unit=""):
     perc = min((value / target) * 100, 100) if target > 0 else 0
     rimanenti = max(0, target - value)
     
-    status_text = f"Rimangono: {rimanenti}{unit}" if value <= target else f"<span style='color:#EF4444;'>Sforo: +{value-target}{unit}</span>"
+    status_text = f"Rimangono: {rimanenti}{unit}" if value <= target else f"<span style='color:#FF453A;'>Sforo: +{value-target}{unit}</span>"
     
     html = f"""
-    <div style="background-color: #161B26; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;">
+    <div style="background-color: #1C1C1E; padding: 18px; border-radius: 20px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="color: {color_hex}; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">{title}</span>
-            <span style="font-size: 11px; color: #94A3B8; font-weight: 600;">{status_text}</span>
+            <span style="color: {color_hex}; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">{title}</span>
+            <span style="font-size: 11px; color: #8E8E93; font-weight: 600;">{status_text}</span>
         </div>
-        <div style="font-size: 24px; font-weight: 800; color: #FFFFFF; line-height: 1;">
-            {value}{unit} <span style="font-size: 13px; color:#64748B; font-weight: 600;">/ {target}{unit}</span>
+        <div style="font-size: 28px; font-weight: 800; color: #FFFFFF; line-height: 1;">
+            {value}{unit} <span style="font-size: 14px; color:#8E8E93; font-weight: 600;">/ {target}{unit}</span>
         </div>
-        <div style="width: 100%; background-color: rgba(255,255,255,0.05); border-radius: 10px; height: 6px; margin-top: 12px; overflow: hidden;">
+        <div style="width: 100%; background-color: #2C2C2E; border-radius: 10px; height: 8px; margin-top: 14px; overflow: hidden;">
             <div style="width: {perc}%; background-color: {color_hex}; height: 100%; border-radius: 10px;"></div>
         </div>
     </div>
     """
     return html
-
 def render_macro_bar(pro, carb, fat):
     tot = (pro * 4) + (carb * 4) + (fat * 9)
     if tot == 0: return ""
