@@ -341,18 +341,40 @@ with tab1:
                     st.markdown(html_pasto, unsafe_allow_html=True)
                     
                     # Aggiunta del bottone Modifica a fianco di Elimina
-                    c1, c2, c3 = st.columns([2, 1, 1])
+                    # Bottoni: Preferiti, Modifica, Elimina (3 colonne per massimizzare l'area di tocco su smartphone)
+                    c1, c2, c3 = st.columns(3)
+                    
+                    with c1:
+                        if st.button("⭐ Salva", key=f"fav_{pasto['id']}", use_container_width=True):
+                            # Creiamo il pacchetto dati per i preferiti
+                            nuovo_fav = {
+                                "id": f"fav_{pasto['id']}",
+                                "nome": pasto["nome"],
+                                "cal": pasto["cal"],
+                                "pro": pasto["pro"],
+                                "carb": pasto["carb"],
+                                "fat": pasto["fat"]
+                            }
+                            # Evita di salvare mille volte lo stesso pasto
+                            if not any(f["nome"] == nuovo_fav["nome"] for f in preferiti):
+                                preferiti.append(nuovo_fav)
+                                salva_dati(FILE_PREFERITI, preferiti)
+                                st.toast(f"{pasto['nome']} salvato nei preferiti!", icon="✅")
+                            else:
+                                st.toast("Pasto già presente nei preferiti!", icon="⚠️")
+                                
                     with c2:
                         if st.button("Modifica", key=f"edit_{pasto['id']}", use_container_width=True):
                             st.session_state["edit_pasto_id"] = pasto["id"]
                             st.rerun()
+                            
                     with c3:
                         if st.button("Elimina", key=f"del_{pasto['id']}", use_container_width=True):
                             storico = [p for p in storico if p["id"] != pasto["id"]]
                             salva_dati(FILE_STORICO, storico)
                             st.rerun()
-                    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
-    # --- REVISIONE E MODIFICA RAPIDA (DRAFT MEAL) ---
+                            
+                    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)    # --- REVISIONE E MODIFICA RAPIDA (DRAFT MEAL) ---
     else:
         st.markdown("<h4 style='color: #10B981; font-weight: 800; margin-top: 20px;'>⚡ Modifica Rapida Porzioni</h4>", unsafe_allow_html=True)
         st.write("L'IA ha scomposto il piatto. Correggi i grammi o aggiungi condimenti nascosti prima di salvare.")
