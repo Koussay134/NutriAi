@@ -192,14 +192,7 @@ tab1, tab2, tab3 = st.tabs(["📸 Diario", "⭐ Preferiti", "⚙️ Target & Sto
 # TAB 1: DIARIO E SCANNER AI
 # ==========================================
 with tab1:
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown(render_macro_card("Calorie", tot_cal, impostazioni['target_cal'], "#10B981", "kcal"), unsafe_allow_html=True)
-        st.markdown(render_macro_card("Carboidrati", tot_carb, impostazioni['target_carb'], "#F59E0B", "g"), unsafe_allow_html=True)
-    with c2:
-        st.markdown(render_macro_card("Proteine", tot_pro, impostazioni['target_pro'], "#38BDF8", "g"), unsafe_allow_html=True)
-        st.markdown(render_macro_card("Grassi", tot_fat, impostazioni['target_fat'], "#EC4899", "g"), unsafe_allow_html=True)
-    
+    st.markdown(render_apple_dashboard(tot_cal, tot_pro, tot_carb, tot_fat, impostazioni['target_cal'], impostazioni['target_pro'], impostazioni['target_carb'], impostazioni['target_fat']), unsafe_allow_html=True)
     if st.session_state.draft_meal is None:
         st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-top: 15px; margin-bottom: 10px;'>Aggiungi Pasto o Prodotto</h4>", unsafe_allow_html=True)
         nota_utente = st.text_input("Nota rapida (es. '200g crudo', o 'Ne ho mangiati 50g')", placeholder="Aggiungi contesto per l'IA...")
