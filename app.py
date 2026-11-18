@@ -360,6 +360,42 @@ with tab1:
                     except Exception as e:
                         st.error(f"Errore: {e}")
 
+       # --- INSERIMENTO MANUALE (SENZA FOTO) ---
+        st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+        with st.expander("✍️ Inserimento Manuale Veloce (Senza Foto)"):
+            with st.form("form_inserimento_manuale"):
+                st.markdown("<div style='color: #8E8E93; font-size: 13px; margin-bottom: 10px; font-weight: 600;'>Aggiungi un pasto al volo o recupera un giorno precedente:</div>", unsafe_allow_html=True)
+                
+                c_data, c_nome = st.columns([1, 2])
+                data_manuale = c_data.date_input("📅 Data", value=datetime.now().date())
+                nome_manuale = c_nome.text_input("🍽️ Nome Pasto", placeholder="es. Shaker 30g Pro")
+                
+                st.markdown("<div style='margin-top: 5px;'></div>", unsafe_allow_html=True)
+                c_cal, c_carb, c_pro, c_fat = st.columns(4)
+                cal_manuale = c_cal.number_input("Kcal", min_value=0, step=50, value=0)
+                carb_manuale = c_carb.number_input("Carbo", min_value=0, step=5, value=0)
+                pro_manuale = c_pro.number_input("Pro", min_value=0, step=5, value=0)
+                fat_manuale = c_fat.number_input("Fat", min_value=0, step=5, value=0)
+                
+                submit_manuale = st.form_submit_button("💾 Salva Pasto Manuale", type="primary", use_container_width=True)
+                
+                if submit_manuale:
+                    if nome_manuale.strip() == "":
+                        st.error("Inserisci almeno il nome del pasto!")
+                    else:
+                        nuovo_pasto_manuale = {
+                            "id": str(uuid.uuid4()), 
+                            "data": str(data_manuale), 
+                            "nome": nome_manuale,
+                            "cal": cal_manuale, 
+                            "pro": pro_manuale, 
+                            "carb": carb_manuale, 
+                            "fat": fat_manuale
+                        }
+                        storico.append(nuovo_pasto_manuale)
+                        salva_dati(FILE_STORICO, storico)
+                        st.rerun()
+        
         # --- ELENCO PASTI SALVATI OGGI ---
         st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-top: 35px; margin-bottom: 15px;'>Pasti di Oggi</h4>", unsafe_allow_html=True)
         if not pasti_oggi:
