@@ -5,6 +5,8 @@ import json
 import os
 from datetime import datetime, timedelta
 import uuid
+import gspread
+from google.oauth2.service_account import Credentials
 
 # --- 1. CONFIGURAZIONE APP E STATO ---
 st.set_page_config(page_title="NutriAI Pro", page_icon="📱", layout="centered")
@@ -84,15 +86,59 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIONE DATI PERMANENTI ---
-def carica_dati(file_path, default_data):
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return default_data
+# --- CONNESSIONE AL DATABASE GOOGLE SHEETS ---
+@st.cache_resource
+def get_db():
+    # Legge il JSON segreto dalla cassaforte di Streamlit
+    creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    client = gspread.authorize(creds)
+    return client.open("NutriAI_Database") 
+
+def carica_dati(file_path, default_data=None):
+    db = get_db()
+    try:
+        if "impostazioni" in file_path.lower():
+            records = db.worksheet("Impostazioni").get_all_records()
+            if not records: return default_data if default_data else {}
+            return {str(r["Chiave"]): r["Valore"] for r in records if "Chiave" in r}
+        elif "preferiti" in file_path.lower():
+            records = db.worksheet("Preferiti").get_all_records()
+            return records if records else (default_data if default_data else [])
+        else:
+            records = db.worksheet("Storico").get_all_records()
+            return records if records else (default_data if default_data else [])
+    except Exception:
+        # Previene crash se i fogli sono ancora vuoti o inesistenti
+        return default_data if default_data is not None else ([] if "impostazioni" not in file_path.lower() else {})
 
 def salva_dati(file_path, dati):
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(dati, f, indent=4)
+    db = get_db()
+    if "impostazioni" in file_path.lower():
+        foglio = db.worksheet("Impostazioni")
+        foglio.clear()
+        if dati:
+            righe = [["Chiave", "Valore"]] + [[k, v] for k, v in dati.items()]
+            foglio.update(values=righe, range_name="A1")
+    elif "preferiti" in file_path.lower():
+        foglio = db.worksheet("Preferiti")
+        foglio.clear()
+        if not dati: return
+        chiavi = list(dati[0].keys())
+        righe = [chiavi]
+        for item in dati:
+            righe.append([item.get(k, "") for k in chiavi])
+        foglio.update(values=righe, range_name="A1")
+    else:
+        foglio = db.worksheet("Storico")
+        foglio.clear()
+        if not dati: return
+        chiavi = list(dati[0].keys())
+        righe = [chiavi]
+        for item in dati:
+            righe.append([item.get(k, "") for k in chiavi])
+        foglio.update(values=righe, range_name="A1")
 
 storico = carica_dati(FILE_STORICO, [])
 preferiti = carica_dati(FILE_PREFERITI, [])
