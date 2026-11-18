@@ -94,7 +94,7 @@ def get_db():
     scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
     client = gspread.authorize(creds)
-   return client.open_by_url("[https://docs.google.com/spreadsheets/d/1Bbss3dfgGSOlkbmF_X16g5y6X8kISlAsBf2RuP0fuL4](https://docs.google.com/spreadsheets/d/1Bbss3dfgGSOlkbmF_X16g5y6X8kISlAsBf2RuP0fuL4)")
+    return client.open_by_url("[https://docs.google.com/spreadsheets/d/1Bbss3dfgGSOlkbmF_X16g5y6X8kISlAsBf2RuP0fuL4](https://docs.google.com/spreadsheets/d/1Bbss3dfgGSOlkbmF_X16g5y6X8kISlAsBf2RuP0fuL4)")
 
 def carica_dati(file_path, default_data=None):
     db = get_db()
